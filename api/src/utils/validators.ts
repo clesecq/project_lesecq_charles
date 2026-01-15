@@ -235,5 +235,8 @@ export function validatePollutionData(data: any): ValidationError[] {
   const photoUrlError = validatePhotoUrl(data.photoUrl);
   if (photoUrlError) errors.push(photoUrlError);
 
+  const discoveredByError = validateName(data.discoveredBy, 'discoveredBy');
+  if (discoveredByError) errors.push(discoveredByError);
+
   return errors;
 }

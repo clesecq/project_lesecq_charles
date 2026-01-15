@@ -73,8 +73,22 @@
           }
         </label>
         <label class="form__row">
-          <span>Photo (URL)</span>
+          <span>Photo (URL ou fichier)</span>
           <input type="url" formControlName="photoUrl" placeholder="https://..." />
+        </label>
+        <label class="form__row">
+          <span>Ou uploader une photo</span>
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+          @if (selectedPhoto()) {
+            <span class="form__info">Fichier sélectionné: {{ selectedPhoto()?.name }}</span>
+          }
+        </label>
+        <label class="form__row">
+          <span>Identité du découvreur</span>
+          <input type="text" formControlName="discoveredBy" placeholder="Nom et prénom du témoin" />
+          @if (createForm.controls.discoveredBy.invalid && createForm.controls.discoveredBy.touched) {
+            <span class="form__error">L'identité du découvreur est requise (3 caractères minimum).</span>
+          }
         </label>
         <div class="form__actions">
           <button type="submit" [disabled]="createForm.invalid || isLoading()">Declarer</button>

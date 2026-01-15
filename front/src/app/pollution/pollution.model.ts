@@ -10,6 +10,9 @@ export interface Pollution {
   latitude: number;
   longitude: number;
   photoUrl?: string;
+  photo?: boolean; // Indicates if a photo blob exists
+  photoMimeType?: string;
+  discoveredBy: string;
 }
 
 export type PollutionPayload = Omit<Pollution, 'id'>;

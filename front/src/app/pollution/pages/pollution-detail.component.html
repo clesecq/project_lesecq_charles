@@ -68,17 +68,27 @@
           <span class="summary__label">Description</span>
           <span class="summary__value">{{ pollutionData.description }}</span>
         </div>
-        @if (pollutionData.photoUrl) {
-          <div class="summary__item">
+        <div class="summary__item">
+          <span class="summary__label">Découvert par</span>
+          <span class="summary__value">{{ pollutionData.discoveredBy }}</span>
+        </div>
+        @if (pollutionData.photo || pollutionData.photoUrl) {
+          <div class="summary__item summary__item--full">
             <span class="summary__label">Photo</span>
-            <a
-              class="summary__value summary__value--link"
-              [href]="pollutionData.photoUrl"
-              target="_blank"
-              rel="noopener"
-            >
-              Ouvrir le lien
-            </a>
+            @if (pollutionData.photo) {
+              <img [src]="service.getPhotoUrl(pollutionData.id)" alt="Photo de la pollution" style="max-width: 100%; height: auto; border-radius: 4px;" />
+            } @else if (pollutionData.photoUrl) {
+              <a
+                class="summary__value summary__value--link"
+                [href]="pollutionData.photoUrl"
+                target="_blank"
+                rel="noopener"
+              >
+                Ouvrir le lien
+              </a>
+            }
+          </div>
+        }
           </div>
         }
       </div>
@@ -151,6 +161,27 @@
         <label class="form__row">
           <span>Photo (URL)</span>
           <input type="url" formControlName="photoUrl" />
+        </label>
+        <label class="form__row">
+          <span>Ou uploader une photo</span>
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+          @if (selectedPhoto()) {
+            <span class="form__info">Fichier sélectionné: {{ selectedPhoto()?.name }}</span>
+          }
+        </label>
+        @if (selectedPhoto()) {
+          <div class="form__row">
+            <button type="button" (click)="onUploadPhoto()" [disabled]="isLoading()">
+              Uploader la photo
+            </button>
+          </div>
+        }
+        <label class="form__row">
+          <span>Identité du découvreur</span>
+          <input type="text" formControlName="discoveredBy" placeholder="Nom et prénom du témoin" />
+          @if (form.controls.discoveredBy.invalid && form.controls.discoveredBy.touched) {
+            <span class="form__error">L'identité du découvreur est requise (3 caractères minimum).</span>
+          }
         </label>
         <div class="form__actions">
           <button type="submit" [disabled]="form.invalid || isLoading()">Enregistrer</button>

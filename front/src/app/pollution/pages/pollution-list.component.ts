@@ -74,9 +74,13 @@ export class PollutionListComponent {
         Validators.max(180)
       ]
     }),
-    photoUrl: this.fb.control('')
+    photoUrl: this.fb.control(''),
+    discoveredBy: this.fb.control('', {
+      validators: [Validators.required, Validators.minLength(3)]
+    })
   });
 
+  readonly selectedPhoto = signal<File | null>(null);
   readonly recapPollution = signal<Pollution | null>(null);
   readonly showRecap = computed(() => this.recapPollution() !== null);
 
@@ -136,18 +140,60 @@ export class PollutionListComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (created) => {
-          this.recapPollution.set(created);
-          this.createForm.markAsPristine();
-          this.createForm.markAsUntouched();
+          // If a photo was selected, upload it
+          const photo = this.selectedPhoto();
+          if (photo) {
+            this.pollutionService
+              .uploadPhoto(created.id, photo)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => {
+                  this.recapPollution.set(created);
+                  this.selectedPhoto.set(null);
+                  this.createForm.markAsPristine();
+                  this.createForm.markAsUntouched();
+                },
+                error: () => {
+                  // Still show recap even if photo upload fails
+                  this.recapPollution.set(created);
+                  this.selectedPhoto.set(null);
+                }
+              });
+          } else {
+            this.recapPollution.set(created);
+            this.createForm.markAsPristine();
+            this.createForm.markAsUntouched();
+          }
         }
       });
   }
 
   onRecapReset() {
     this.recapPollution.set(null);
+    this.selectedPhoto.set(null);
     this.createForm.reset(this.defaultCreateValues());
     this.createForm.markAsPristine();
     this.createForm.markAsUntouched();
+  }
+
+  onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La taille du fichier ne doit pas dépasser 5 MB');
+        input.value = '';
+        return;
+      }
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Seuls les fichiers image sont acceptés');
+        input.value = '';
+        return;
+      }
+      this.selectedPhoto.set(file);
+    }
   }
 
   onDelete(id: number) {
@@ -171,7 +217,8 @@ export class PollutionListComponent {
       location: '',
       latitude: 0,
       longitude: 0,
-      photoUrl: ''
+      photoUrl: '',
+      discoveredBy: ''
     };
   }
 

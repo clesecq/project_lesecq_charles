@@ -71,7 +71,8 @@ export class PollutionDetailComponent {
     longitude: this.fb.control(0, {
       validators: [Validators.required, finiteNumberValidator(), Validators.min(-180), Validators.max(180)]
     }),
-    photoUrl: this.fb.control('')
+    photoUrl: this.fb.control(''),
+    discoveredBy: this.fb.control('', { validators: [Validators.required, Validators.minLength(3)] })
   });
 
   private readonly formChanges = toSignal(
@@ -79,6 +80,7 @@ export class PollutionDetailComponent {
     { initialValue: this.form.getRawValue() }
   );
 
+  readonly selectedPhoto = signal<File | null>(null);
   readonly statusMessage = signal<string | null>(null);
 
   constructor() {
@@ -182,6 +184,50 @@ export class PollutionDetailComponent {
 
   labelType(type: PollutionType) {
     return this.typeOptions.find((option) => option.value === type)?.label ?? type;
+  }
+
+  onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('La taille du fichier ne doit pas dépasser 5 MB');
+        input.value = '';
+        return;
+      }
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Seuls les fichiers image sont acceptés');
+        input.value = '';
+        return;
+      }
+      this.selectedPhoto.set(file);
+    }
+  }
+
+  onUploadPhoto() {
+    const id = this.pollutionId();
+    const photo = this.selectedPhoto();
+    
+    if (id === null || !photo) {
+      return;
+    }
+
+    this.service
+      .uploadPhoto(id, photo)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.statusMessage.set('Photo uploadée avec succès');
+          this.selectedPhoto.set(null);
+          setTimeout(() => this.statusMessage.set(null), 3000);
+        },
+        error: () => {
+          this.statusMessage.set('Erreur lors de l\'upload de la photo');
+          setTimeout(() => this.statusMessage.set(null), 3000);
+        }
+      });
   }
 
   private toDateTimeLocal(value: string) {

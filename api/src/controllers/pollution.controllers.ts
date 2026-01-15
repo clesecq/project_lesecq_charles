@@ -24,7 +24,8 @@ export function create(req: Request, res: Response): void {
     location: req.body.location,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
-    photoUrl: req.body.photoUrl
+    photoUrl: req.body.photoUrl,
+    discoveredBy: req.body.discoveredBy
   };
 
   Pollution.create(pollution)
@@ -160,6 +161,88 @@ export function remove(req: Request, res: Response): void {
     .catch(err => {
       res.status(400).send({
         message: "Could not delete Pollution with id=" + id
+      });
+    });
+}
+
+// Upload photo for a pollution
+export function uploadPhoto(req: Request, res: Response): void {
+  const id = req.params.id;
+
+  // Validate ID
+  const idError = validateNumericId(id);
+  if (idError) {
+    res.status(400).send({
+      message: idError.message
+    });
+    return;
+  }
+
+  // Check if file exists
+  if (!req.file) {
+    res.status(400).send({
+      message: "Aucun fichier fourni"
+    });
+    return;
+  }
+
+  // Update pollution with photo data
+  Pollution.update({
+    photo: req.file.buffer,
+    photoMimeType: req.file.mimetype
+  }, {
+    where: { id: id }
+  })
+    .then(num => {
+      if (num[0] === 1) {
+        res.send({
+          message: "Photo uploadée avec succès",
+          filename: req.file!.originalname,
+          size: req.file!.size
+        });
+      } else {
+        res.status(404).send({
+          message: `Cannot find Pollution with id=${id}`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(400).send({
+        message: "Error uploading photo: " + err.message
+      });
+    });
+}
+
+// Get photo for a pollution
+export function getPhoto(req: Request, res: Response): void {
+  const id = req.params.id;
+
+  // Validate ID
+  const idError = validateNumericId(id);
+  if (idError) {
+    res.status(400).send({
+      message: idError.message
+    });
+    return;
+  }
+
+  Pollution.findByPk(id, {
+    attributes: ['photo', 'photoMimeType']
+  })
+    .then(data => {
+      if (data && data.photo) {
+        res.setHeader('Content-Type', data.photoMimeType || 'image/jpeg');
+        res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+        res.send(data.photo);
+      } else {
+        res.status(404).send({
+          message: `No photo found for Pollution with id=${id}`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(400).send({
+        message: "Error retrieving photo: " + err.message
       });
     });
 }

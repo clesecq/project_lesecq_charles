@@ -97,6 +97,34 @@ export class PollutionService {
     return computed(() => this.pollutionsState().find((pollution) => pollution.id === id) ?? null);
   }
 
+  uploadPhoto(id: number, file: File) {
+    this.loadingState.set(true);
+    this.errorState.set(null);
+
+    const formData = new FormData();
+    formData.append('photo', file);
+
+    return this.http.post(`${this.baseUrl}/${id}/photo`, formData).pipe(
+      tap(() => {
+        // Refresh pollution to get updated data
+        this.getById(id).subscribe();
+      }),
+      catchError((error) => {
+        this.errorState.set("Impossible d'uploader la photo.");
+        return throwError(() => error);
+      }),
+      finalize(() => this.loadingState.set(false))
+    );
+  }
+
+  getPhotoUrl(id: number): string {
+    return `${this.baseUrl}/${id}/photo`;
+  }
+
+  hasPhoto(pollution: Pollution): boolean {
+    return !!pollution.photo || !!pollution.photoUrl;
+  }
+
   private upsert(pollution: Pollution) {
     this.pollutionsState.update((pollutions) => {
       const exists = pollutions.some((item) => item.id === pollution.id);

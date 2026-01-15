@@ -248,6 +248,12 @@
   color: #dc2626;
 }
 
+.form__info {
+  font-size: 0.75rem;
+  color: #059669;
+  font-weight: 500;
+}
+
 @media (max-width: 720px) {
   .page__header {
     flex-direction: column;

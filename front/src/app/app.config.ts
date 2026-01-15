@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideStore(
       [FavoritesState, AuthState],
       withNgxsStoragePlugin({
-        keys: ['favorites', 'auth']
+        keys: ['favorites']
       })
     )
   ]

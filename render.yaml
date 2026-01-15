@@ -18,7 +18,7 @@ projects:
       name: project_lesecq_charles
       runtime: static
       repo: https://github.com/clesecq/project_lesecq_charles
-      buildCommand: pnpm install && pnpm build
+      buildCommand: pnpm ci && pnpm build
       staticPublishPath: dist/tp/browser
       routes:
       - type: rewrite
@@ -55,7 +55,7 @@ projects:
       - key: ACCESS_TOKEN_SECRET
         generateValue: true
       region: frankfurt
-      buildCommand: pnpm install && pnpm build
+      buildCommand: pnpm ci && pnpm build
       startCommand: pnpm start
       autoDeployTrigger: commit
       rootDir: api

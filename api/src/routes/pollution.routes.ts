@@ -8,6 +8,7 @@ export default (app: Application): void => {
 
   // Public routes - Retrieve all/single pollutions
   router.get("/", pollution.findAll);
+  router.get("/search", pollution.search);
   router.get("/:id", pollution.findById);
   router.get("/:id/photo", pollution.getPhoto);
 

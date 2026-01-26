@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal, computed } from '@angular/core';
-import { catchError, finalize, tap, throwError } from 'rxjs';
+import { catchError, finalize, tap, throwError, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { User, UserPayload } from './user.model';
 
@@ -27,7 +27,8 @@ export class UserService {
         this.errorState.set('Impossible de charger les utilisateurs.');
         return throwError(() => error);
       }),
-      finalize(() => this.loadingState.set(false))
+      finalize(() => this.loadingState.set(false)),
+      shareReplay(1)
     );
   }
 

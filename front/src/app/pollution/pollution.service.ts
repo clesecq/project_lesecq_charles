@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, computed, signal } from '@angular/core';
-import { catchError, finalize, tap, throwError } from 'rxjs';
+import { catchError, finalize, tap, throwError, shareReplay, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Pollution, PollutionPayload } from './pollution.model';
 
@@ -27,7 +27,8 @@ export class PollutionService {
         this.errorState.set('Impossible de charger les pollutions.');
         return throwError(() => error);
       }),
-      finalize(() => this.loadingState.set(false))
+      finalize(() => this.loadingState.set(false)),
+      shareReplay(1)
     );
   }
 
@@ -41,7 +42,8 @@ export class PollutionService {
         this.errorState.set('Pollution introuvable.');
         return throwError(() => error);
       }),
-      finalize(() => this.loadingState.set(false))
+      finalize(() => this.loadingState.set(false)),
+      shareReplay(1)
     );
   }
 
@@ -127,6 +129,23 @@ export class PollutionService {
 
   hasPhoto(pollution: Pollution): boolean {
     return !!pollution.photo;
+  }
+
+  /**
+   * Server-side search with automatic request cancellation.
+   * When used with switchMap, previous requests are cancelled when a new search is triggered.
+   * Example usage:
+   * searchControl.valueChanges.pipe(
+   *   debounceTime(300),
+   *   distinctUntilChanged(),
+   *   switchMap(query => this.pollutionService.search(query))
+   * )
+   */
+  search(query: string): Observable<Pollution[]> {
+    const params: Record<string, string> = query ? { q: query } : {};
+    return this.http.get<Pollution[]>(`${this.baseUrl}/search`, { params }).pipe(
+      shareReplay(1)
+    );
   }
 
   private upsert(pollution: Pollution) {

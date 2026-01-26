@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Op } from "sequelize";
 import db from "../models/index.js";
 import { validatePollutionData, validateNumericId } from "../utils/validators.js";
 
@@ -54,6 +55,53 @@ export function findAll(req: Request, res: Response): void {
     .catch(err => {
       res.status(400).send({
         message: err.message || "Error retrieving pollutions"
+      });
+    });
+}
+
+// Search pollutions by query
+export function search(req: Request, res: Response): void {
+  const query = req.query.q as string || '';
+  const searchTerm = `%${query.toLowerCase()}%`;
+
+  Pollution.findAll({
+    where: {
+      [Op.or]: [
+        db.sequelize.where(
+          db.sequelize.fn('LOWER', db.sequelize.col('title')),
+          'LIKE',
+          searchTerm
+        ),
+        db.sequelize.where(
+          db.sequelize.fn('LOWER', db.sequelize.col('description')),
+          'LIKE',
+          searchTerm
+        ),
+        db.sequelize.where(
+          db.sequelize.fn('LOWER', db.sequelize.col('location')),
+          'LIKE',
+          searchTerm
+        ),
+        db.sequelize.where(
+          db.sequelize.fn('LOWER', db.sequelize.col('discoveredBy')),
+          'LIKE',
+          searchTerm
+        )
+      ]
+    },
+    attributes: {
+      exclude: ['photo', 'photoMimeType'],
+      include: [
+        [db.sequelize.literal('CASE WHEN photo IS NOT NULL THEN TRUE ELSE FALSE END'), 'photo']
+      ]
+    }
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(400).send({
+        message: err.message || "Error searching pollutions"
       });
     });
 }

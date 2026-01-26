@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, injec
 import { ReactiveFormsModule, Validators, NonNullableFormBuilder } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { map, startWith } from 'rxjs';
+import { map, startWith, debounceTime, distinctUntilChanged } from 'rxjs';
 import { PollutionService } from '../pollution.service';
 import { Pollution, PollutionPayload, PollutionType } from '../pollution.model';
 import { finiteNumberValidator, validDateTimeValidator } from '../pollution.validators';
@@ -37,9 +37,11 @@ export class PollutionListComponent {
   ];
 
   readonly filtersForm = this.fb.group({
-    title: this.fb.control(''),
+    searchText: this.fb.control(''),
     location: this.fb.control(''),
-    type: this.fb.control<'all' | PollutionType>('all')
+    type: this.fb.control<'all' | PollutionType>('all'),
+    dateFrom: this.fb.control(''),
+    dateTo: this.fb.control('')
   });
 
   readonly createForm = this.fb.group({
@@ -86,26 +88,56 @@ export class PollutionListComponent {
   private readonly filters = toSignal(
     this.filtersForm.valueChanges.pipe(
       startWith(this.filtersForm.getRawValue()),
+      debounceTime(300),
       map((values) => ({
-        title: (values.title ?? '').trim().toLowerCase(),
+        searchText: (values.searchText ?? '').trim().toLowerCase(),
         location: (values.location ?? '').trim().toLowerCase(),
-        type: values.type ?? 'all'
-      }))
+        type: values.type ?? 'all',
+        dateFrom: values.dateFrom ? new Date(values.dateFrom) : null,
+        dateTo: values.dateTo ? new Date(values.dateTo) : null
+      })),
+      distinctUntilChanged((prev, curr) => 
+        prev.searchText === curr.searchText &&
+        prev.location === curr.location &&
+        prev.type === curr.type &&
+        prev.dateFrom?.getTime() === curr.dateFrom?.getTime() &&
+        prev.dateTo?.getTime() === curr.dateTo?.getTime()
+      )
     ),
-    { initialValue: { title: '', location: '', type: 'all' as const } }
+    { initialValue: { searchText: '', location: '', type: 'all' as const, dateFrom: null, dateTo: null } }
   );
 
   readonly filteredPollutions = computed(() => {
     const filters = this.filters();
 
     return this.pollutions().filter((pollution) => {
-      const titleMatch = filters.title ? pollution.title.toLowerCase().includes(filters.title) : true;
+      // Search text matches title, description, or discoveredBy
+      const searchMatch = filters.searchText
+        ? pollution.title.toLowerCase().includes(filters.searchText) ||
+          pollution.description.toLowerCase().includes(filters.searchText) ||
+          pollution.discoveredBy.toLowerCase().includes(filters.searchText)
+        : true;
+      
       const locationMatch = filters.location
         ? pollution.location.toLowerCase().includes(filters.location)
         : true;
+      
       const typeMatch = filters.type === 'all' ? true : pollution.type === filters.type;
-      return titleMatch && locationMatch && typeMatch;
+      
+      // Date range filtering
+      const observedDate = new Date(pollution.observedAt);
+      const dateFromMatch = filters.dateFrom ? observedDate >= filters.dateFrom : true;
+      const dateToMatch = filters.dateTo ? observedDate <= filters.dateTo : true;
+      
+      return searchMatch && locationMatch && typeMatch && dateFromMatch && dateToMatch;
     });
+  });
+
+  readonly resultCount = computed(() => this.filteredPollutions().length);
+  readonly hasActiveFilters = computed(() => {
+    const filters = this.filters();
+    return filters.searchText !== '' || filters.location !== '' || filters.type !== 'all' ||
+           filters.dateFrom !== null || filters.dateTo !== null;
   });
 
   constructor() {
@@ -204,6 +236,16 @@ export class PollutionListComponent {
       .remove(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
+  }
+
+  onClearFilters() {
+    this.filtersForm.reset({
+      searchText: '',
+      location: '',
+      type: 'all',
+      dateFrom: '',
+      dateTo: ''
+    });
   }
 
   private defaultCreateValues() {

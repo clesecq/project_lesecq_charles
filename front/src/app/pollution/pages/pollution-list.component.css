@@ -115,6 +115,40 @@
   gap: 1rem;
 }
 
+.filters__actions {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.filters__info {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filters__clear {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background: #ffffff;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filters__clear:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
 .alert {
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;

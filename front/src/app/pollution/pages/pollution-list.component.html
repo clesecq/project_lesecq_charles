@@ -105,8 +105,8 @@
     <h3>Filtres</h3>
     <form class="filters" [formGroup]="filtersForm">
       <label>
-        <span>Titre</span>
-        <input type="search" formControlName="title" placeholder="Filtrer par titre" />
+        <span>Recherche globale</span>
+        <input type="search" formControlName="searchText" placeholder="Rechercher dans titre, description, découvreur..." />
       </label>
       <label>
         <span>Lieu</span>
@@ -121,7 +121,25 @@
           }
         </select>
       </label>
+      <label>
+        <span>Date de début</span>
+        <input type="date" formControlName="dateFrom" />
+      </label>
+      <label>
+        <span>Date de fin</span>
+        <input type="date" formControlName="dateTo" />
+      </label>
     </form>
+    <div class="filters__actions">
+      @if (hasActiveFilters()) {
+        <p class="filters__info">
+          {{ resultCount() }} résultat@if (resultCount() > 1) {s} trouvé@if (resultCount() > 1) {s}
+          <button type="button" (click)="onClearFilters()" class="filters__clear">Effacer les filtres</button>
+        </p>
+      } @else {
+        <p class="filters__info">{{ resultCount() }} pollution@if (resultCount() > 1) {s} au total</p>
+      }
+    </div>
   </section>
 
   @if (error()) {

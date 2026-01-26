@@ -83,11 +83,13 @@ export default (sequelize: Sequelize) => {
     },
     photo: {
       type: DataTypes.BLOB('long'),
-      allowNull: true
+      allowNull: true,
+      field: 'photo'
     },
     photoMimeType: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      field: 'photo_mime_type'
     },
     discoveredBy: {
       type: DataTypes.STRING,

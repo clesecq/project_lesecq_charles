@@ -20,7 +20,7 @@ export class PollutionDetailComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly service = inject(PollutionService);
+  readonly service = inject(PollutionService);
   private readonly destroyRef = inject(DestroyRef);
   readonly favoritesService = inject(FavoritesService);
 

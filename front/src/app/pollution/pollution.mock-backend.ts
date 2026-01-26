@@ -18,7 +18,8 @@ const inMemoryPollutions: Pollution[] = [
     location: 'Paris - Quai de Bercy',
     latitude: 48.833,
     longitude: 2.379,
-    photoUrl: 'https://example.com/photos/seine-filets.jpg'
+    photoUrl: 'https://example.com/photos/seine-filets.jpg',
+    discoveredBy: 'Jean Dupont'
   },
   {
     id: 2,
@@ -28,7 +29,8 @@ const inMemoryPollutions: Pollution[] = [
     observedAt: new Date('2025-03-09T09:10:00Z').toISOString(),
     location: 'Lyon - Port Edouard Herriot',
     latitude: 45.723,
-    longitude: 4.839
+    longitude: 4.839,
+    discoveredBy: 'Marie Martin'
   },
   {
     id: 3,
@@ -39,7 +41,8 @@ const inMemoryPollutions: Pollution[] = [
     location: 'Marseille - Quartier de la Cabucelle',
     latitude: 43.322,
     longitude: 5.359,
-    photoUrl: 'https://example.com/photos/marseille-gravats.jpg'
+    photoUrl: 'https://example.com/photos/marseille-gravats.jpg',
+    discoveredBy: 'Pierre Durand'
   },
   {
     id: 4,
@@ -49,7 +52,8 @@ const inMemoryPollutions: Pollution[] = [
     observedAt: new Date('2025-03-10T06:30:00Z').toISOString(),
     location: 'Grenoble - Isere a Saint-Martin-le-Vinoux',
     latitude: 45.203,
-    longitude: 5.697
+    longitude: 5.697,
+    discoveredBy: 'Sophie Bernard'
   },
   {
     id: 5,
@@ -59,7 +63,8 @@ const inMemoryPollutions: Pollution[] = [
     observedAt: new Date('2025-03-08T19:20:00Z').toISOString(),
     location: 'Toulouse - Zone Portuaire du Sud-Ouest',
     latitude: 43.598,
-    longitude: 1.427
+    longitude: 1.427,
+    discoveredBy: 'Luc Petit'
   }
 ];
 

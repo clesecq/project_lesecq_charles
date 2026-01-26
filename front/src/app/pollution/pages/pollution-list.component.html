@@ -73,10 +73,6 @@
           }
         </label>
         <label class="form__row">
-          <span>Photo (URL ou fichier)</span>
-          <input type="url" formControlName="photoUrl" placeholder="https://..." />
-        </label>
-        <label class="form__row">
           <span>Ou uploader une photo</span>
           <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
           @if (selectedPhoto()) {
@@ -191,11 +187,6 @@
               <td>{{ pollution.location }}</td>
               <td>
                 <span>{{ pollution.latitude }}, {{ pollution.longitude }}</span>
-                @if (pollution.photoUrl) {
-                  <p class="table__note">
-                    <a [href]="pollution.photoUrl" target="_blank" rel="noopener">Voir la photo</a>
-                  </p>
-                }
               </td>
               <td class="table__actions">
                 <button 

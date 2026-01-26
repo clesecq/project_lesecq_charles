@@ -119,10 +119,6 @@ export class PollutionService {
     );
   }
 
-  getPhotoUrl(id: number): string {
-    return `${this.baseUrl}/${id}/photo`;
-  }
-
   getPhoto(id: number) {
     return this.http.get(`${this.baseUrl}/${id}/photo`, { responseType: 'blob' });
   }

@@ -53,13 +53,6 @@ const TYPE_LABELS: Record<PollutionType, string> = {
             <dd>{{ pollution.longitude }}</dd>
           </div>
         </dl>
-
-        @if (pollution.photoUrl) {
-          <figure class="recap__photo">
-            <img [src]="pollution.photoUrl" alt="Illustration de la pollution" loading="lazy" />
-            <figcaption>Photo transmise lors de la declaration.</figcaption>
-          </figure>
-        }
       </section>
     }
   `,

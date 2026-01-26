@@ -257,7 +257,6 @@ export class PollutionListComponent {
       location: '',
       latitude: 0,
       longitude: 0,
-      photoUrl: '',
       discoveredBy: ''
     };
   }

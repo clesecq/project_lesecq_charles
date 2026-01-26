@@ -108,7 +108,7 @@ export function search(req: Request, res: Response): void {
 
 // Get a single pollution by ID
 export function findById(req: Request, res: Response): void {
-  const id = req.params.id;
+  const id = req.params.id as string;
 
   // Validate ID
   const idError = validateNumericId(id);
@@ -119,7 +119,7 @@ export function findById(req: Request, res: Response): void {
     return;
   }
 
-  Pollution.findByPk(id, {
+  Pollution.findByPk(parseInt(id), {
     attributes: {
       exclude: ['photo', 'photoMimeType'],
       include: [
@@ -145,7 +145,7 @@ export function findById(req: Request, res: Response): void {
 
 // Update a pollution by ID
 export function update(req: Request, res: Response): void {
-  const id = req.params.id;
+  const id = req.params.id as string;
 
   // Validate ID
   const idError = validateNumericId(id);
@@ -167,12 +167,12 @@ export function update(req: Request, res: Response): void {
   }
 
   Pollution.update(req.body, {
-    where: { id: id }
+    where: { id: parseInt(id) }
   })
     .then(num => {
       if (num[0] === 1) {
         // Fetch and return the updated record
-        Pollution.findByPk(id)
+        Pollution.findByPk(parseInt(id))
           .then(data => {
             res.send(data);
           })
@@ -196,7 +196,7 @@ export function update(req: Request, res: Response): void {
 
 // Delete a pollution by ID
 export function remove(req: Request, res: Response): void {
-  const id = req.params.id;
+  const id = req.params.id as string;
 
   // Validate ID
   const idError = validateNumericId(id);
@@ -228,7 +228,7 @@ export function remove(req: Request, res: Response): void {
 
 // Upload photo for a pollution
 export function uploadPhoto(req: Request, res: Response): void {
-  const id = req.params.id;
+  const id = req.params.id as string;
 
   // Validate ID
   const idError = validateNumericId(id);
@@ -276,7 +276,7 @@ export function uploadPhoto(req: Request, res: Response): void {
 
 // Get photo for a pollution
 export function getPhoto(req: Request, res: Response): void {
-  const id = req.params.id;
+  const id = req.params.id as string;
 
   // Validate ID
   const idError = validateNumericId(id);

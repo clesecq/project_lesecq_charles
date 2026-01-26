@@ -18,7 +18,6 @@ const inMemoryPollutions: Pollution[] = [
     location: 'Paris - Quai de Bercy',
     latitude: 48.833,
     longitude: 2.379,
-    photoUrl: 'https://example.com/photos/seine-filets.jpg',
     discoveredBy: 'Jean Dupont'
   },
   {
@@ -41,7 +40,6 @@ const inMemoryPollutions: Pollution[] = [
     location: 'Marseille - Quartier de la Cabucelle',
     latitude: 43.322,
     longitude: 5.359,
-    photoUrl: 'https://example.com/photos/marseille-gravats.jpg',
     discoveredBy: 'Pierre Durand'
   },
   {

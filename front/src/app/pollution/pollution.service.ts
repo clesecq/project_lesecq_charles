@@ -121,8 +121,12 @@ export class PollutionService {
     return `${this.baseUrl}/${id}/photo`;
   }
 
+  getPhoto(id: number) {
+    return this.http.get(`${this.baseUrl}/${id}/photo`, { responseType: 'blob' });
+  }
+
   hasPhoto(pollution: Pollution): boolean {
-    return !!pollution.photo || !!pollution.photoUrl;
+    return !!pollution.photo;
   }
 
   private upsert(pollution: Pollution) {

@@ -24,7 +24,6 @@ export function create(req: Request, res: Response): void {
     location: req.body.location,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
-    photoUrl: req.body.photoUrl,
     discoveredBy: req.body.discoveredBy
   };
 
@@ -41,7 +40,14 @@ export function create(req: Request, res: Response): void {
 
 // Get all pollutions
 export function findAll(req: Request, res: Response): void {
-  Pollution.findAll()
+  Pollution.findAll({
+    attributes: {
+      exclude: ['photo', 'photoMimeType'],
+      include: [
+        [db.sequelize.literal('CASE WHEN photo IS NOT NULL THEN TRUE ELSE FALSE END'), 'photo']
+      ]
+    }
+  })
     .then(data => {
       res.send(data);
     })
@@ -65,7 +71,14 @@ export function findById(req: Request, res: Response): void {
     return;
   }
 
-  Pollution.findByPk(id)
+  Pollution.findByPk(id, {
+    attributes: {
+      exclude: ['photo', 'photoMimeType'],
+      include: [
+        [db.sequelize.literal('CASE WHEN photo IS NOT NULL THEN TRUE ELSE FALSE END'), 'photo']
+      ]
+    }
+  })
     .then(data => {
       if (data) {
         res.send(data);

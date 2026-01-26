@@ -71,11 +71,6 @@
               <td>{{ pollution.location }}</td>
               <td>
                 <span>{{ pollution.latitude }}, {{ pollution.longitude }}</span>
-                @if (pollution.photoUrl) {
-                  <p class="table__note">
-                    <a [href]="pollution.photoUrl" target="_blank" rel="noopener">Voir la photo</a>
-                  </p>
-                }
               </td>
               <td class="table__actions">
                 <button 

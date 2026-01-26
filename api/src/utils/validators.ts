@@ -164,16 +164,6 @@ export function validateLongitude(longitude: number): ValidationError | null {
   return null;
 }
 
-export function validatePhotoUrl(url: string | undefined): ValidationError | null {
-  if (!url) {
-    return null; // Optional field
-  }
-  if (!REGEX_URL.test(url)) {
-    return { field: 'photoUrl', message: 'URL de photo invalide' };
-  }
-  return null;
-}
-
 export function validateNumericId(id: string, fieldName: string = 'id'): ValidationError | null {
   if (!id) {
     return { field: fieldName, message: `${fieldName} est requis` };
@@ -231,9 +221,6 @@ export function validatePollutionData(data: any): ValidationError[] {
 
   const longitudeError = validateLongitude(data.longitude);
   if (longitudeError) errors.push(longitudeError);
-
-  const photoUrlError = validatePhotoUrl(data.photoUrl);
-  if (photoUrlError) errors.push(photoUrlError);
 
   const discoveredByError = validateName(data.discoveredBy, 'discoveredBy');
   if (discoveredByError) errors.push(discoveredByError);

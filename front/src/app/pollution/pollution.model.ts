@@ -9,7 +9,6 @@ export interface Pollution {
   location: string;
   latitude: number;
   longitude: number;
-  photoUrl?: string;
   photo?: boolean; // Indicates if a photo blob exists
   photoMimeType?: string;
   discoveredBy: string;

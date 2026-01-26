@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, signal, viewChild, ElementRef } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, startWith } from 'rxjs';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { PollutionService } from '../pollution.service';
 import { PollutionPayload, PollutionType } from '../pollution.model';
 import { finiteNumberValidator, validDateTimeValidator } from '../pollution.validators';
@@ -23,6 +24,7 @@ export class PollutionDetailComponent {
   readonly service = inject(PollutionService);
   private readonly destroyRef = inject(DestroyRef);
   readonly favoritesService = inject(FavoritesService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly isLoading = this.service.isLoading;
   readonly error = this.service.error;
@@ -71,7 +73,6 @@ export class PollutionDetailComponent {
     longitude: this.fb.control(0, {
       validators: [Validators.required, finiteNumberValidator(), Validators.min(-180), Validators.max(180)]
     }),
-    photoUrl: this.fb.control(''),
     discoveredBy: this.fb.control('', { validators: [Validators.required, Validators.minLength(3)] })
   });
 
@@ -81,7 +82,10 @@ export class PollutionDetailComponent {
   );
 
   readonly selectedPhoto = signal<File | null>(null);
+  readonly photoObjectUrl = signal<SafeUrl | null>(null);
   readonly statusMessage = signal<string | null>(null);
+  
+  readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
   constructor() {
     effect(() => {
@@ -108,16 +112,23 @@ export class PollutionDetailComponent {
           location: pollution.location,
           latitude: pollution.latitude,
           longitude: pollution.longitude,
-          photoUrl: pollution.photoUrl ?? ''
+          discoveredBy: pollution.discoveredBy
         },
         { emitEvent: false }
       );
-    }, { allowSignalWrites: true });
+
+      // Load photo if exists
+      if (pollution.photo) {
+        this.loadPhoto(pollution.id);
+      } else {
+        this.photoObjectUrl.set(null);
+      }
+    });
 
     effect(() => {
       this.formChanges();
       this.statusMessage.set(null);
-    }, { allowSignalWrites: true });
+    });
   }
 
   onSave() {
@@ -135,8 +146,9 @@ export class PollutionDetailComponent {
 
     const payload: PollutionPayload = {
       ...raw,
-      observedAt: this.toIso(raw.observedAt),
-      photoUrl: raw.photoUrl?.trim() ? raw.photoUrl.trim() : undefined
+      latitude: Number(raw.latitude),
+      longitude: Number(raw.longitude),
+      observedAt: this.toIso(raw.observedAt)
     };
 
     this.service
@@ -219,13 +231,19 @@ export class PollutionDetailComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          // Reset the file input
+          const input = this.fileInput();
+          if (input) {
+            input.nativeElement.value = '';
+          }
           this.statusMessage.set('Photo uploadée avec succès');
           this.selectedPhoto.set(null);
-          setTimeout(() => this.statusMessage.set(null), 3000);
+          // Reload the photo to display it
+          this.loadPhoto(id);
         },
-        error: () => {
+        error: (err) => {
+          console.error('Upload error:', err);
           this.statusMessage.set('Erreur lors de l\'upload de la photo');
-          setTimeout(() => this.statusMessage.set(null), 3000);
         }
       });
   }
@@ -244,6 +262,21 @@ export class PollutionDetailComponent {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
+
+  private loadPhoto(id: number) {
+    this.service
+      .getPhoto(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (blob) => {
+          const url = URL.createObjectURL(blob);
+          this.photoObjectUrl.set(this.sanitizer.bypassSecurityTrustUrl(url));
+        },
+        error: () => {
+          this.photoObjectUrl.set(null);
+        }
+      });
+  }
   private toIso(value: string) {
     if (!value) {
       return new Date().toISOString();

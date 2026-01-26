@@ -13,14 +13,13 @@ export interface PollutionAttributes {
   location: string;
   latitude: number;
   longitude: number;
-  photoUrl?: string;
   photo?: Buffer;
   photoMimeType?: string;
   discoveredBy: string;
 }
 
 // Optional fields for creation (id is auto-generated)
-interface PollutionCreationAttributes extends Optional<PollutionAttributes, 'id' | 'photoUrl' | 'photo' | 'photoMimeType'> {}
+interface PollutionCreationAttributes extends Optional<PollutionAttributes, 'id' | 'photo' | 'photoMimeType'> {}
 
 // Model class
 export class Pollution extends Model<PollutionAttributes, PollutionCreationAttributes> 
@@ -33,7 +32,6 @@ export class Pollution extends Model<PollutionAttributes, PollutionCreationAttri
   public location!: string;
   public latitude!: number;
   public longitude!: number;
-  public photoUrl?: string;
   public photo?: Buffer;
   public photoMimeType?: string;
   public discoveredBy!: string;
@@ -76,10 +74,6 @@ export default (sequelize: Sequelize) => {
     longitude: {
       type: DataTypes.DECIMAL(10, 6),
       allowNull: false
-    },
-    photoUrl: {
-      type: DataTypes.STRING,
-      allowNull: true
     },
     photo: {
       type: DataTypes.BLOB('long'),

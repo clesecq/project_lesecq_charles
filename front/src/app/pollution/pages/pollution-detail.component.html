@@ -72,20 +72,11 @@
           <span class="summary__label">Découvert par</span>
           <span class="summary__value">{{ pollutionData.discoveredBy }}</span>
         </div>
-        @if (pollutionData.photo || pollutionData.photoUrl) {
+        @if (pollutionData.photo) {
           <div class="summary__item summary__item--full">
             <span class="summary__label">Photo</span>
-            @if (pollutionData.photo) {
-              <img [src]="service.getPhotoUrl(pollutionData.id)" alt="Photo de la pollution" style="max-width: 100%; height: auto; border-radius: 4px;" />
-            } @else if (pollutionData.photoUrl) {
-              <a
-                class="summary__value summary__value--link"
-                [href]="pollutionData.photoUrl"
-                target="_blank"
-                rel="noopener"
-              >
-                Ouvrir le lien
-              </a>
+            @if (pollutionData.photo && photoObjectUrl()) {
+              <img [src]="photoObjectUrl()" alt="Photo de la pollution" style="max-width: 100%; height: auto; border-radius: 4px;" />
             }
           </div>
         }
@@ -157,12 +148,8 @@
           }
         </label>
         <label class="form__row">
-          <span>Photo (URL)</span>
-          <input type="url" formControlName="photoUrl" />
-        </label>
-        <label class="form__row">
-          <span>Ou uploader une photo</span>
-          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+          <span>Uploader une photo</span>
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" #fileInput />
           @if (selectedPhoto()) {
             <span class="form__info">Fichier sélectionné: {{ selectedPhoto()?.name }}</span>
           }

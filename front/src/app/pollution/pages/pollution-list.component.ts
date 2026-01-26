@@ -74,7 +74,6 @@ export class PollutionListComponent {
         Validators.max(180)
       ]
     }),
-    photoUrl: this.fb.control(''),
     discoveredBy: this.fb.control('', {
       validators: [Validators.required, Validators.minLength(3)]
     })
@@ -131,8 +130,7 @@ export class PollutionListComponent {
     const raw = this.createForm.getRawValue();
     const payload: PollutionPayload = {
       ...raw,
-      observedAt: this.toIso(raw.observedAt),
-      photoUrl: raw.photoUrl?.trim() ? raw.photoUrl.trim() : undefined
+      observedAt: this.toIso(raw.observedAt)
     };
 
     this.pollutionService

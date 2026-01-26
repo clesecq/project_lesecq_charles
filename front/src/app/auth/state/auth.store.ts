@@ -22,7 +22,7 @@ export interface AuthStateModel {
 // Actions
 export class Login {
   static readonly type = '[Auth] Login';
-  constructor(public email: string, public password: string) {}
+  constructor(public pseudo: string, public password: string) {}
 }
 
 export class Register {
@@ -97,7 +97,7 @@ export class AuthState {
   login(ctx: StateContext<AuthStateModel>, action: Login) {
     ctx.patchState({ loading: true, error: null });
 
-    return this.authService.login(action.email, action.password).pipe(
+    return this.authService.login(action.pseudo, action.password).pipe(
       tap((response) => {
         ctx.patchState({
           accessToken: response.accessToken,

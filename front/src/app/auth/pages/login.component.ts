@@ -24,22 +24,17 @@ import { Login, AuthState } from '../state/auth.store';
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="pseudo">Pseudo</label>
             <input 
-              id="email" 
-              type="email" 
-              formControlName="email"
-              placeholder="votre.email@example.com"
-              [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              id="pseudo" 
+              type="text" 
+              formControlName="pseudo"
+              placeholder="Votre pseudo"
+              [class.invalid]="loginForm.get('pseudo')?.invalid && loginForm.get('pseudo')?.touched"
             />
-            @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            @if (loginForm.get('pseudo')?.invalid && loginForm.get('pseudo')?.touched) {
               <div class="error">
-                @if (loginForm.get('email')?.hasError('required')) {
-                  L'email est requis
-                }
-                @if (loginForm.get('email')?.hasError('email')) {
-                  L'email n'est pas valide
-                }
+                Le pseudo est requis
               </div>
             }
           </div>
@@ -215,7 +210,7 @@ export class LoginComponent {
   readonly loading$ = this.store.select(AuthState.loading);
 
   readonly loginForm = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    pseudo: ['', [Validators.required]],
     password: ['', [Validators.required]]
   });
 
@@ -224,9 +219,9 @@ export class LoginComponent {
       return;
     }
 
-    const { email, password } = this.loginForm.getRawValue();
+    const { pseudo, password } = this.loginForm.getRawValue();
     
-    this.store.dispatch(new Login(email, password)).subscribe(() => {
+    this.store.dispatch(new Login(pseudo, password)).subscribe(() => {
       const isAuthenticated = this.store.selectSnapshot(AuthState.isAuthenticated);
       if (isAuthenticated) {
         this.router.navigate(['/pollutions']);

@@ -21,9 +21,9 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/auth`;
 
-  login(email: string, password: string): Observable<AuthResponse> {
+  login(pseudo: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, {
-      email,
+      pseudo,
       password,
     });
   }

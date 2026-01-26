@@ -80,26 +80,26 @@ export async function register(req: Request, res: Response): Promise<void> {
  */
 export async function login(req: Request, res: Response): Promise<void> {
   try {
-    const { email, password } = req.body;
+    const { pseudo, password } = req.body;
 
     // Validate credentials format
-    const loginError = validateLogin(email);
-    const passwordError = validatePassword(password);
+    const loginError = validateLogin(pseudo || '');
+    const passwordError = validatePassword(password || '');
 
     if (loginError || passwordError) {
       res.status(400).send({
-        message: 'Email ou mot de passe incorrect',
+        message: 'Pseudo ou mot de passe incorrect',
         errors: [loginError, passwordError].filter(e => e !== null)
       });
       return;
     }
 
-    // Find user by email (login field)
-    const user = await Utilisateur.findOne({ where: { login: email } });
+    // Find user by pseudo (login field)
+    const user = await Utilisateur.findOne({ where: { login: pseudo } });
 
     if (!user) {
       res.status(401).send({
-        message: 'Email ou mot de passe incorrect'
+        message: 'Pseudo ou mot de passe incorrect'
       });
       return;
     }
@@ -109,7 +109,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 
     if (!isPasswordValid) {
       res.status(401).send({
-        message: 'Email ou mot de passe incorrect'
+        message: 'Pseudo ou mot de passe incorrect'
       });
       return;
     }

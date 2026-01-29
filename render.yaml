@@ -15,9 +15,9 @@ projects:
       postgresMajorVersion: "17"
     services:
     - type: web
-      name: project_lesecq_charles
+      name: projet_lesecq_charles
       runtime: static
-      repo: https://github.com/clesecq/project_lesecq_charles
+      repo: https://github.com/clesecq/projet_lesecq_charles
       buildCommand: npm ci && npm run build
       staticPublishPath: dist/tp/browser
       routes:
@@ -29,7 +29,7 @@ projects:
     - type: web
       name: tp_api_lesecq_charles
       runtime: node
-      repo: https://github.com/clesecq/project_lesecq_charles
+      repo: https://github.com/clesecq/projet_lesecq_charles
       plan: free
       envVars:
       - key: DB_USER
